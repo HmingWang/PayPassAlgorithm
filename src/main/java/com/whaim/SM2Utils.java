@@ -2,10 +2,13 @@ package com.whaim;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Base64;
+
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.util.Arrays;
 
 public class SM2Utils {
     //生成随机秘钥对
@@ -22,7 +25,7 @@ public class SM2Utils {
     }
 
     //数据加密
-    public static String encrypt(byte[] publicKey, byte[] data) throws IOException
+    public static byte[] encrypt(byte[] publicKey, byte[] data) throws IOException
     {
         if (publicKey == null || publicKey.length == 0)
         {
@@ -50,7 +53,14 @@ public class SM2Utils {
 //      System.out.println("C2 " + Util.byteToHex(source));
 //      System.out.println("C3 " + Util.byteToHex(c3));
         //C1 C2 C3拼装成加密字串
-        return Util.byteToHex(c1.getEncoded()) + Util.byteToHex(source) + Util.byteToHex(c3);
+        byte[] res = new byte[c1.getEncoded().length + source.length + c3.length];
+        System.arraycopy(c1.getEncoded(), 0, res, 0, c1.getEncoded().length);
+        System.arraycopy(source, 0, res, c1.getEncoded().length, source.length);
+        System.arraycopy(c3, 0, res, c1.getEncoded().length+source.length, c3.length);
+        //return Util.byteToHex(c1.getEncoded()) + Util.byteToHex(source) + Util.byteToHex(c3);
+
+        //return Base64.getMimeEncoder().encodeToString(res);
+        return res;
 
     }
 
